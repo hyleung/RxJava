@@ -38,6 +38,7 @@ import rx.internal.operators.OperatorSubscribeOn;
 import rx.internal.operators.OperatorTimeout;
 import rx.internal.operators.OperatorZip;
 import rx.internal.producers.SingleDelayedProducer;
+import rx.observables.BlockingSingle;
 import rx.observers.SafeSubscriber;
 import rx.plugins.RxJavaObservableExecutionHook;
 import rx.plugins.RxJavaPlugins;
@@ -1760,6 +1761,10 @@ public class Single<T> {
             other = Single.<T> error(new TimeoutException());
         }
         return lift(new OperatorTimeout<T>(timeout, timeUnit, asObservable(other), scheduler));
+    }
+
+    public final BlockingSingle<T> toBlocking() {
+        return BlockingSingle.from(this);
     }
 
     /**

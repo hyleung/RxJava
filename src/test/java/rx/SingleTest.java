@@ -12,10 +12,6 @@
  */
 package rx;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -29,9 +25,12 @@ import rx.Single.OnSubscribe;
 import rx.functions.Action0;
 import rx.functions.Func1;
 import rx.functions.Func2;
+import rx.observables.BlockingSingle;
 import rx.observers.TestSubscriber;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.Subscriptions;
+
+import static org.junit.Assert.*;
 
 public class SingleTest {
 
@@ -246,6 +245,14 @@ public class SingleTest {
         ts.awaitTerminalEvent();
         ts.assertNoErrors();
         ts.assertValue("hello");
+    }
+
+    @Test
+    public void testToBlocking() {
+        Single<String> s = Single.just("one");
+        BlockingSingle<String> blocking = s.toBlocking();
+        assertNotNull(blocking);
+        assertEquals("one", blocking.get());
     }
 
     @Test
