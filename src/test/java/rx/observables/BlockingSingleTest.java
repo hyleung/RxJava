@@ -15,6 +15,8 @@ import rx.exceptions.TestException;
 
 import java.util.concurrent.Future;
 
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.isA;
 import static org.junit.Assert.assertEquals;
 
 /**
@@ -50,7 +52,7 @@ public class BlockingSingleTest {
 	public void testSingleErrorChecked() {
 		Single<String> single = Single.error(new TestCheckedException());
 		BlockingSingle<? extends String> blockingSingle = BlockingSingle.from(single);
-		exception.expect(throwableWithCause(TestCheckedException.class));
+		exception.expectCause(isA(TestCheckedException.class));
 		blockingSingle.get();
 	}
 
@@ -63,36 +65,6 @@ public class BlockingSingleTest {
 		assertEquals("one", result);
 	}
 
-	static ThrowableWithCause throwableWithCause(Class<? extends Throwable> expected) {
-		return new ThrowableWithCause(expected);
-	}
-
 	private static final class TestCheckedException extends Exception {
-	}
-
-
-	private static class ThrowableWithCause extends BaseMatcher<Throwable> {
-		private final Class<? extends Throwable> expected;
-		private Throwable actual;
-		private ThrowableWithCause(Class<? extends Throwable> expected) {
-			this.expected = expected;
-		}
-
-		@Override
-		public boolean matches(Object o) {
-			if (o instanceof RuntimeException) {
-				actual = (RuntimeException) o;
-				return actual.getCause().getClass().equals(expected);
-			}
-			return false;
-		}
-
-		@Override
-		public void describeTo(Description description) {
-			description.appendText(String
-					.format("Expected: %s, Actual: %s",
-							expected.getCanonicalName(),
-							actual.getClass().getCanonicalName()));
-		}
 	}
 }
